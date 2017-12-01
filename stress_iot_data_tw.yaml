@@ -1,0 +1,61 @@
+#
+# Keyspace name and create CQL
+#
+keyspace: lucasdb
+keyspace_definition: |
+  CREATE KEYSPACE lucasdb WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3};
+#
+# Table name and create CQL
+#
+table: iot_data_tw
+table_definition: |
+  CREATE TABLE iot_data_tw(
+        device_id uuid,
+        service_name text,
+        observation_time timestamp,
+        device_name text STATIC,
+        observed_value float,
+        PRIMARY KEY (device_id, service_name, observation_time)
+  ) WITH CLUSTERING ORDER BY ( service_name ASC, observation_time DESC ) AND compression = {'enabled':'false'} AND default_time_to_live = 3600 AND gc_grace_seconds = 1800 AND compaction= {'compaction_window_size': '10', 'compaction_window_unit': 'MINUTES', 'class': 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy','log_all':true};;
+
+#
+# Meta information for generating data
+#
+columnspec:
+  - name: device_id
+    size: fixed(32) #In chars, no. of chars of UUID
+    population: seq(1..1000000)  
+  - name: service_name
+    size: uniform(8..15)
+    population: seq(1..30)
+    cluster: fixed(5)    #numero de series de um sensor (temperatura, umidade etc)
+  - name: observation_time
+    cluster: fixed(60) 
+  - name: device_name
+    size: fixed(10)
+    population: seq(1..10000) 
+  - name: observed_value
+    size: fixed(4)
+    population: GAUSSIAN(1..40,25,9)
+
+# Specs for insert queries
+#
+insert:
+  partitions: fixed(1)      # 1 partition per batch
+  batchtype: UNLOGGED       # use unlogged batches
+  select: fixed(1)/1      # no chance of skipping a row when generating inserts
+ 
+#
+# Read queries to run against the schema
+#
+queries:
+   devdata:
+      cql: select * from iot_data_tw where device_id = ?
+      fields: samerow             # pick selection values from same row in partition
+   onerow:
+      cql: select * from iot_data_tw where device_id = ? and service_name = ? and observation_time = ?
+      fields: samerow             # pick selection values from same row in partition
+   avgdat:
+      cql: select device_id, avg(observed_value) FROM iot_data_tw where device_id = ?
+      fields: samerow
+
