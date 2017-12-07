@@ -1,0 +1,37 @@
+DELETE FROM rt4_cassandra_metricas
+where metric like 'Compaction.PendingTasks'
+  or metric like 'Compaction.PendingTasksByTableName'
+  or metric like 'Compaction.CompletedTasks'
+  or metric like 'Table.PendingCompactions.lucasdb%'
+  or metric like 'ClientRequest.%';
+  
+  mysql> SELECT table_schema "DB Name",
+ Round(Sum(data_length + index_length) / 1024 / 1024, 1) "DB Size in MB"
+FROM   information_schema.tables
+ GROUP  BY table_schema;
++------------------------+---------------+
+| DB Name                | DB Size in MB |
++------------------------+---------------+
+| information_schema     |           0.2 |
+| lucasbenevides_diamond |       10220.1 |
++------------------------+---------------+
+2 rows in set (0.01 sec)
+
+mysql> GR
+    -> ;
+;
+^C
+mysql> select count(*) from cassandra_metricas;
++----------+
+| count(*) |
++----------+
+| 18967552 |
++----------+
+
+
+rt6 - metrics-20171013-115515
+rt8 - metrics-20171013-120136
+rt9 - metrics-20171019-103427
+rt10 - metrics-20171013-120340
+
+Table.WriteLatency.lucasdb.tw_ttl_2h_110min

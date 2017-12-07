@@ -1,0 +1,4 @@
+{"type":"enable","keyspace":"lucasdb","table":"tw_ttl_2h_120min","time":1509036206545,"strategies":[{"strategyId":"0","type":"TimeWindowCompactionStrategy","tables":[],"repaired":true,"folders":["/var/lib/cassandra/data"]},{"strategyId":"1","type":"TimeWindowCompactionStrategy","tables":[],"repaired":false,"folders":["/var/lib/cassandra/data"]}]}
+{"type":"enable","keyspace":"lucasdb","table":"tw_ttl_2h_130min","time":1509036206570,"strategies":[{"strategyId":"0","type":"TimeWindowCompactionStrategy","tables":[],"repaired":true,"folders":["/var/lib/cassandra/data"]},{"strategyId":"1","type":"TimeWindowCompactionStrategy","tables":[],"repaired":false,"folders":["/var/lib/cassandra/data"]}]}
+{"type":"disable","keyspace":"lucasdb","table":"tw_ttl_2h_120min","time":1509040649806,"strategies":[{"strategyId":"0"},{"strategyId":"1"}]}
+{"type":"disable","keyspace":"lucasdb","table":"tw_ttl_2h_130min","time":1509040651122,"strategies":[{"strategyId":"0"},{"strategyId":"1"}]}

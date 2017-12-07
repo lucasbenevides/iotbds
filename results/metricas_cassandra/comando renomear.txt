@@ -1,0 +1,46 @@
+dir | Rename-Item -9NewName {$_.Directory.Name + "-" + $_.Name}
+
+--para intalar o perl mysql
+cpan -i DBI
+cpan -i DBD
+sudo apt-get install libdbd-mysql-perl
+
+CREATE TABLE cassandra_metricas ( 
+	id int unsigned auto_increment PRIMARY KEY, 
+	server char(3) NOT NULL, 
+	timestamp int unsigned NOT NULL, 
+	metric varchar(255) NOT NULL, 
+	type varchar(10), 
+	value varchar(15) NOT NULL,
+	value_f float NULL, 
+	CONSTRAINT UK_Metrics UNIQUE KEY (server, timestamp, metric,type)
+	);
+
+ mysql -h 172.16.20.253 -u lucasbenevides -D lucasbenevides_diamond --password=ctILDawFM7QXxUYT1oKxKZ6uQektqz
+
+ALTER TABLE rt3_cassandra_metricas ADD CONSTRAINT PK_id PRIMARY KEY PK_RT3_ID (id); 
+alter table rt3_cassandra_metricas DROP COLUMN server;
+ALTER TABLE rt3_cassandra_metricas ADD CONSTRAINT UK_rt3 UNIQUE KEY (timestamp, metric, type);
+
+INSERT INTO rt4_cassandra_metricas (timestamp, metric, type, value, value_f)
+	SELECT timestamp, metric, type, value, value_f
+	FROM cassandra_metricas WHERE server like 'rt4'
+
+CREATE TABLE `rt4_cassandra_metricas` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `timestamp` int(10) unsigned NOT NULL,
+  `metric` varchar(255) NOT NULL,
+  `type` varchar(20) DEFAULT NULL,
+  `value` varchar(40) DEFAULT NULL,
+  `value_f` float DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_rt4` (`timestamp`,`metric`,`type`)
+) ENGINE=InnoDB;
+
+DELETE FROM cassandra_metricas WHERE server = 'rt5'
+
+org.apache.cassandra.metrics.Compaction.BytesCompacted.csv
+org.apache.cassandra.metrics.Compaction.CompletedTasks.csv
+org.apache.cassandra.metrics.Compaction.PendingTasksByTableName.csv
+org.apache.cassandra.metrics.Compaction.PendingTasks.csv
+org.apache.cassandra.metrics.Compaction.TotalCompactionsCompleted.csv
